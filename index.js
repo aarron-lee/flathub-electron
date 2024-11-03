@@ -81,7 +81,11 @@ async function createWindow() {
       event.preventDefault();
     }
 
-    if (url.pathname.startsWith("/repo/") && url.host == "dl.flathub.org") {
+    if (
+      url.pathname.startsWith("/repo/") &&
+      url.host == "dl.flathub.org" &&
+      url.pathname.includes(".flatpakref")
+    ) {
       const flatpakRef = url.pathname
         .split("/")
         .pop()
