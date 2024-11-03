@@ -68,6 +68,8 @@ async function createWindow() {
     },
   });
 
+  win.setMenuBarVisibility(false);
+
   await win.loadURL("https://flathub.org/", {});
 
   win.webContents.on("will-navigate", (event) => {
