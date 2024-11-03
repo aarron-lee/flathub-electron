@@ -1,0 +1,38 @@
+{
+  "name": "flathub",
+  "version": "1.0.0",
+  "description": "Electron wrapper for flathub",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.aarronlee.flathub-electron",
+    "productName": "Flathub",
+    "electronDownload": {
+      "mirror": "https://github.com/castlabs/electron-releases/releases/download/v"
+    },
+    "files": [
+      "index.js",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "img/icon.svg",
+      "artifactName": "${productName}_v${version}_linux.${ext}",
+      "category": "Utility"
+    }
+  },
+  "keywords": [],
+  "author": "aarron-lee",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "github:castlabs/electron-releases#v31.3.1+wvcus",
+    "electron-builder": "^24.13.3"
+  },
+  "packageManager": "pnpm@8.15.4+sha1.c85a4305534f76d461407b59277b954bac97b5c4"
+}
