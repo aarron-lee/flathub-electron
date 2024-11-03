@@ -1,7 +1,12 @@
 const { app, BrowserWindow } = require("electron");
 const { dialog } = require("electron");
+const { exec, spawn } = require("child_process");
 
-const { spawn } = require("child_process");
+const APP_INSTALL_TYPE = {
+  Cancel: 0,
+  User: 1,
+  System: 2,
+};
 
 async function createWindow() {
   const win = new BrowserWindow({
@@ -15,7 +20,7 @@ async function createWindow() {
 
   await win.loadURL("https://flathub.org/", {});
 
-  win.webContents.on("will-navigate", (event) => {
+  win.webContents.on("will-navigate", async (event) => {
     const url = new URL(event.url);
 
     const validOrigins = ["https://dl.flathub.org", "https://flathub.org"];
@@ -24,28 +29,35 @@ async function createWindow() {
       event.preventDefault();
     }
 
-    if (
-      url.pathname.startsWith("/repo/") &&
-      url.host == "dl.flathub.org" &&
-      url.pathname.includes(".flatpakref")
-    ) {
+    if (url.host == "dl.flathub.org" && url.pathname.includes(".flatpakref")) {
+      event.preventDefault();
+
+      let remotes = ["system", "user"];
+
+      try {
+        remotes = await getFlatpakRemotes();
+      } catch (e) {
+        console.error(`error while fetching remotes, ${e}`);
+      }
+
       const flatpakRef = url.pathname
         .split("/")
         .pop()
         .replace(".flatpakref", "");
 
-      event.preventDefault();
+      let idx = APP_INSTALL_TYPE.System;
 
-      const idx = dialog.showMessageBoxSync({
-        title: "Select App Install Type",
-        message: "Select your App Install Type",
-        detail: `System Flatpaks are available to all users on your device.\nUser Flatpaks are installed only available to that user.\n\nIf you are unsure, install the System flatpak`,
-        buttons: ["Cancel", "User", "System"],
-      });
+      if (remotes.length > 1) {
+        idx = dialog.showMessageBoxSync({
+          title: "Select App Install Type",
+          message: "Select your App Install Type",
+          detail: `System Flatpaks are available to all users on your device.\nUser Flatpaks are installed only available to that user.\n\nIf you are unsure, install the System flatpak`,
+          buttons: Object.keys(APP_INSTALL_TYPE),
+        });
 
-      if (idx === 0) {
-        // cancelled, return
-        return;
+        if (idx === APP_INSTALL_TYPE.Cancel) {
+          return;
+        }
       }
 
       const terminal = spawn(
@@ -53,7 +65,7 @@ async function createWindow() {
         [
           "install",
           "flathub",
-          idx === 1 ? "--user" : "--system",
+          idx === APP_INSTALL_TYPE.User ? "--user" : "--system",
           "--noninteractive",
           "-y",
           flatpakRef,
@@ -165,4 +177,23 @@ function removeLoadingDialog(win) {
   `;
 
   win.webContents.executeJavaScript(cmd);
+}
+
+async function getFlatpakRemotes() {
+  return new Promise((resolve, reject) => {
+    exec("flatpak remotes", (error, stdout, stderr) => {
+      if (error) {
+        return reject(`Error executing command: ${stderr}`);
+      }
+
+      const lines = stdout.trim().split("\n");
+
+      const options = lines.map((line) => {
+        const [_, option] = line.trim().split("\t");
+        return option;
+      });
+
+      resolve(options);
+    });
+  });
 }
