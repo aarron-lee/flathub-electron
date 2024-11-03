@@ -3,63 +3,6 @@ const { dialog } = require("electron");
 
 const { spawn } = require("child_process");
 
-function createLoadingDialog(win) {
-  const cmd = `
-    var createDialog = () => {
-      const dialog = document.createElement("dialog");
-      dialog.setAttribute("id", "install-in-progress-dialog");
-      dialog.setAttribute(
-        "style",
-        \`
-        position: fixed;
-        top: 50%;
-        margin-left:auto;
-        margin-right:auto;
-        background: rgba(0,0,0,0.5);
-        border-radius: 50%;
-      \`
-      );
-
-      dialog.innerHTML = \`<style>
-      #electronLoadingSpinner {
-        border: 16px solid #f3f3f3; /* Light grey */
-        border-top: 16px solid #3498db; /* Blue */
-        border-radius: 50%;
-        width: 120px;
-        height: 120px;
-        animation: spin 2s linear infinite;
-      }
-
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    </style>
-    <div id="electronLoadingSpinner"></div>\`;
-
-      document.body.appendChild(dialog);
-
-      dialog.show();
-
-    };
-    createDialog();
-  `;
-
-  win.webContents.executeJavaScript(cmd);
-}
-
-function removeLoadingDialog(win) {
-  const cmd = `
-    var removeDialog = () => {
-      const d = document.getElementById('install-in-progress-dialog');
-      if (d) d.remove();
-    }
-    removeDialog();
-  `;
-
-  win.webContents.executeJavaScript(cmd);
-}
-
 async function createWindow() {
   const win = new BrowserWindow({
     webPreferences: {
@@ -166,3 +109,60 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+function createLoadingDialog(win) {
+  const cmd = `
+    var createDialog = () => {
+      const dialog = document.createElement("dialog");
+      dialog.setAttribute("id", "install-in-progress-dialog");
+      dialog.setAttribute(
+        "style",
+        \`
+        position: fixed;
+        top: 50%;
+        margin-left:auto;
+        margin-right:auto;
+        background: rgba(0,0,0,0.5);
+        border-radius: 50%;
+      \`
+      );
+
+      dialog.innerHTML = \`<style>
+      #electronLoadingSpinner {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    <div id="electronLoadingSpinner"></div>\`;
+
+      document.body.appendChild(dialog);
+
+      dialog.show();
+
+    };
+    createDialog();
+  `;
+
+  win.webContents.executeJavaScript(cmd);
+}
+
+function removeLoadingDialog(win) {
+  const cmd = `
+    var removeDialog = () => {
+      const d = document.getElementById('install-in-progress-dialog');
+      if (d) d.remove();
+    }
+    removeDialog();
+  `;
+
+  win.webContents.executeJavaScript(cmd);
+}
