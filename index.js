@@ -32,32 +32,15 @@ async function createWindow() {
     if (url.host == "dl.flathub.org" && url.pathname.includes(".flatpakref")) {
       event.preventDefault();
 
-      let remotes = ["system", "user"];
-
-      try {
-        remotes = await getFlatpakRemotes();
-      } catch (e) {
-        console.error(`error while fetching remotes, ${e}`);
-      }
-
       const flatpakRef = url.pathname
         .split("/")
         .pop()
         .replace(".flatpakref", "");
 
-      let idx = APP_INSTALL_TYPE.System;
+      const installType = await getAppInstallType();
 
-      if (remotes.length > 1) {
-        idx = dialog.showMessageBoxSync({
-          title: "Select App Install Type",
-          message: "Select your App Install Type",
-          detail: `System Flatpaks are available to all users on your device.\nUser Flatpaks are installed only available to that user.\n\nIf you are unsure, install the System flatpak`,
-          buttons: Object.keys(APP_INSTALL_TYPE),
-        });
-
-        if (idx === APP_INSTALL_TYPE.Cancel) {
-          return;
-        }
+      if (installType === APP_INSTALL_TYPE.Cancel) {
+        return;
       }
 
       const terminal = spawn(
@@ -65,7 +48,7 @@ async function createWindow() {
         [
           "install",
           "flathub",
-          idx === APP_INSTALL_TYPE.User ? "--user" : "--system",
+          installType === APP_INSTALL_TYPE.User ? "--user" : "--system",
           "--noninteractive",
           "-y",
           flatpakRef,
@@ -181,7 +164,7 @@ function removeLoadingDialog(win) {
 
 async function getFlatpakRemotes() {
   return new Promise((resolve, reject) => {
-    exec("flatpak remotes", (error, stdout, stderr) => {
+    exec("flatpak remotes | grep flathub", (error, stdout, stderr) => {
       if (error) {
         return reject(`Error executing command: ${stderr}`);
       }
@@ -196,4 +179,55 @@ async function getFlatpakRemotes() {
       resolve(options);
     });
   });
+}
+
+async function getAppInstallType() {
+  let remotes = [];
+
+  try {
+    remotes = await getFlatpakRemotes();
+    console.log("available flathub remotes:", remotes);
+  } catch (e) {
+    console.error(`error while fetching remotes, ${e}`);
+    dialog.showMessageBox({
+      title: "Error",
+      type: "error",
+      message: `No remotes found for Flathub ${e}`,
+    });
+    return APP_INSTALL_TYPE.Cancel;
+  }
+
+  if (!remotes.includes("system") && !remotes.includes("user")) {
+    // no available remotes for flathub, prompt error
+    dialog.showMessageBox({
+      title: "Error",
+      type: "error",
+      message: `No remotes available for Flathub, please make sure you have flathub configured correctly`,
+    });
+    return APP_INSTALL_TYPE.Cancel;
+  }
+  if (remotes.length === 1) {
+    const remote = remotes[0];
+
+    switch (remote) {
+      case "user":
+        return APP_INSTALL_TYPE.User;
+      case "system":
+        return APP_INSTALL_TYPE.System;
+    }
+  }
+  if (
+    remotes.length == 2 &&
+    remotes.includes("system") &&
+    remotes.includes("user")
+  ) {
+    let idx = dialog.showMessageBoxSync({
+      title: "Select App Install Type",
+      message: "Select your App Install Type",
+      detail: `System Flatpaks are available to all users on your device.\nUser Flatpaks are installed only available to that user.\n\nIf you are unsure, install the System flatpak`,
+      buttons: Object.keys(APP_INSTALL_TYPE),
+    });
+
+    return idx;
+  }
 }
