@@ -1,12 +1,15 @@
-const { app, BrowserWindow } = require("electron");
-const { dialog } = require("electron");
+const { app, BrowserWindow, BrowserView, dialog } = require("electron");
 const { exec, spawn } = require("child_process");
+
+const navigation = require("./src/navigation");
 
 const APP_INSTALL_TYPE = {
   Cancel: 0,
   User: 1,
   System: 2,
 };
+
+const TABS = {};
 
 async function createWindow() {
   const win = new BrowserWindow({
@@ -18,77 +21,10 @@ async function createWindow() {
 
   win.setMenuBarVisibility(false);
 
-  await win.loadURL("https://flathub.org/", {});
+  const navigationTab = navigation.renderNavigation(win);
+  TABS.NAVIGATION = navigationTab;
 
-  win.webContents.on("will-navigate", async (event) => {
-    const url = new URL(event.url);
-
-    const validOrigins = ["https://dl.flathub.org", "https://flathub.org"];
-
-    if (!validOrigins.includes(url.origin)) {
-      event.preventDefault();
-    }
-
-    if (url.host == "dl.flathub.org" && url.pathname.includes(".flatpakref")) {
-      event.preventDefault();
-
-      const flatpakRef = url.pathname
-        .split("/")
-        .pop()
-        .replace(".flatpakref", "");
-
-      const installType = await getAppInstallType();
-
-      if (installType === APP_INSTALL_TYPE.Cancel) {
-        return;
-      }
-
-      const terminal = spawn(
-        "flatpak",
-        [
-          "install",
-          "flathub",
-          installType === APP_INSTALL_TYPE.User ? "--user" : "--system",
-          "--noninteractive",
-          "-y",
-          flatpakRef,
-        ],
-        {
-          shell: true,
-        }
-      );
-
-      createLoadingDialog(win);
-
-      let error = false;
-
-      terminal.stderr.on("data", (data) => {
-        console.error(`stderr: ${data}`);
-
-        dialog.showMessageBox({
-          title: "Error",
-          type: "error",
-          message: `Installation failed with error:\n ${data}`,
-        });
-        error = true;
-
-        removeLoadingDialog(win);
-      });
-
-      terminal.on("close", (code) => {
-        console.log(`child process exited with code ${code}`);
-
-        if (code === 0 && !error) {
-          dialog.showMessageBox({
-            title: "Install Complete",
-            type: "info",
-            message: "Installation complete",
-          });
-        }
-        removeLoadingDialog(win);
-      });
-    }
-  });
+  renderFlathub(win);
 }
 
 app.whenReady().then(createWindow);
@@ -230,4 +166,109 @@ async function getAppInstallType() {
 
     return idx;
   }
+}
+
+function renderFlathub(win) {
+  if (TABS.FLATHUB) {
+    return TABS.FLATHUB;
+  }
+
+  const flathubView = new BrowserView({
+    webPreferences: {
+      // devTools: isDev,
+      // enableRemoteModule: false,
+      contextIsolation: true,
+      nodeIntegration: false,
+      // preload: __dirname + "/client-preload.js",
+    },
+  });
+
+  TABS.FLATHUB = flathubView;
+
+  flathubView.webContents.loadURL("https://flathub.org");
+
+  flathubView.setBounds({
+    x: 0,
+    y: 36,
+    width: win.getBounds().width,
+    height: win.getBounds().height - 36,
+  });
+  flathubView.setAutoResize({
+    width: true,
+    height: true,
+    horizontal: false,
+    vertical: false,
+  });
+
+  win.addBrowserView(flathubView);
+
+  flathubView.webContents.on("will-navigate", async (event) => {
+    const url = new URL(event.url);
+
+    const validOrigins = ["https://dl.flathub.org", "https://flathub.org"];
+
+    if (!validOrigins.includes(url.origin)) {
+      event.preventDefault();
+    }
+
+    if (url.host == "dl.flathub.org" && url.pathname.includes(".flatpakref")) {
+      event.preventDefault();
+
+      const flatpakRef = url.pathname
+        .split("/")
+        .pop()
+        .replace(".flatpakref", "");
+
+      const installType = await getAppInstallType();
+
+      if (installType === APP_INSTALL_TYPE.Cancel) {
+        return;
+      }
+
+      const terminal = spawn(
+        "flatpak",
+        [
+          "install",
+          "flathub",
+          installType === APP_INSTALL_TYPE.User ? "--user" : "--system",
+          "--noninteractive",
+          "-y",
+          flatpakRef,
+        ],
+        {
+          shell: true,
+        }
+      );
+
+      createLoadingDialog(win);
+
+      let error = false;
+
+      terminal.stderr.on("data", (data) => {
+        console.error(`stderr: ${data}`);
+
+        dialog.showMessageBox({
+          title: "Error",
+          type: "error",
+          message: `Installation failed with error:\n ${data}`,
+        });
+        error = true;
+
+        removeLoadingDialog(win);
+      });
+
+      terminal.on("close", (code) => {
+        console.log(`child process exited with code ${code}`);
+
+        if (code === 0 && !error) {
+          dialog.showMessageBox({
+            title: "Install Complete",
+            type: "info",
+            message: "Installation complete",
+          });
+        }
+        removeLoadingDialog(win);
+      });
+    }
+  });
 }
