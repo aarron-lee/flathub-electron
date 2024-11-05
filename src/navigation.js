@@ -15,8 +15,8 @@ ipcMain.on("navButtonClicked", (_, buttonName) => {
 function navigateTo(tabName, options = {}) {
   if (tabName === "FLATHUB") {
     if (TABS.CURRENT === "FLATHUB") {
-      // already on flathub page, navigate to flathub.org home
-      TABS.FLATHUB.webContents.loadURL("https://flathub.org");
+      // already on flathub tab, Go Back instead
+      TABS.FLATHUB.webContents.goBack();
     } else if (TABS.CURRENT === "REMOVE") {
       const { targetUrl } = options;
 

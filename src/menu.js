@@ -4,7 +4,8 @@ const navigation = require("./navigation");
 function createMenu() {
   const template = [
     {
-      label: "Flathub",
+      label: "Back",
+      //   label: "\u{1F850}",
       click() {
         navigation.navigateTo("FLATHUB");
       },
