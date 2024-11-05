@@ -22,9 +22,9 @@ function renderFlathub(browserWindow, show = false) {
 
   flathubView.setBounds({
     x: 0,
-    y: 36,
+    y: 0,
     width: browserWindow.getBounds().width,
-    height: browserWindow.getBounds().height - 36,
+    height: browserWindow.getBounds().height,
   });
   flathubView.setAutoResize({
     width: true,

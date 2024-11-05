@@ -24,9 +24,9 @@ function navigateTo(tabName, options = {}) {
 
       TABS.FLATHUB?.setBounds({
         x: 0,
-        y: 36,
+        y: 0,
         width: TABS.ROOT.getBounds().width,
-        height: TABS.ROOT.getBounds().height - 36,
+        height: TABS.ROOT.getBounds().height,
       });
       TABS.FLATHUB?.setAutoResize({
         width: true,
@@ -49,9 +49,9 @@ function navigateTo(tabName, options = {}) {
 
       TABS.REMOVE?.setBounds({
         x: 0,
-        y: 36,
+        y: 0,
         width: TABS.ROOT.getBounds().width,
-        height: TABS.ROOT.getBounds().height - 36,
+        height: TABS.ROOT.getBounds().height,
       });
       TABS.REMOVE?.setAutoResize({
         width: true,
@@ -65,35 +65,5 @@ function navigateTo(tabName, options = {}) {
     }
   }
 }
-function renderNavigation(browserWindow, show = false) {
-  const navigation = new BrowserView({
-    webPreferences: {
-      contextIsolation: true,
-      nodeIntegration: false,
-      preload: path.join(__dirname, "./preload.js"),
-    },
-  });
 
-  navigation.webContents.loadFile(
-    path.join(__dirname, "../static/navigation.html")
-  );
-
-  navigation.setBounds({
-    x: 0,
-    y: 0,
-    width: browserWindow.getBounds().width,
-    height: 36,
-  });
-  navigation.setAutoResize({
-    width: true,
-    height: true,
-    horizontal: false,
-    vertical: false,
-  });
-
-  if (show) browserWindow.addBrowserView(navigation);
-
-  return navigation;
-}
-
-module.exports = { renderNavigation, saveTabs, navigateTo };
+module.exports = { saveTabs, navigateTo };
