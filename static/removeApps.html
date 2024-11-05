@@ -53,44 +53,57 @@
       // clear appList
       appList.replaceChildren();
 
-      data?.forEach((app) => {
-        const { name, appId, version, branch, installType } = app;
+      data
+        .sort((a, b) => {
+          const nameA = a.name.toUpperCase();
+          const nameB = b.name.toUpperCase();
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
 
-        const appInfo = document.createElement("span");
+          return 0;
+        })
+        .forEach((app) => {
+          const { name, appId, version, branch, installType } = app;
 
-        appInfo.innerHTML = `${name} ${appId} ${version} ${branch} ${installType}`;
+          const appInfo = document.createElement("span");
 
-        const removeButton = document.createElement("button");
+          appInfo.innerHTML = `${name} ${appId} ${version} ${branch} ${installType}`;
 
-        removeButton.setAttribute("type", "button");
-        removeButton.innerHTML = "Remove";
+          const removeButton = document.createElement("button");
 
-        removeButton.addEventListener("click", () => {
-          clearTimeout(refreshAppListTimeoutId);
+          removeButton.setAttribute("type", "button");
+          removeButton.innerHTML = "Remove";
 
-          removeButton.innerHTML = "";
+          removeButton.addEventListener("click", () => {
+            clearTimeout(refreshAppListTimeoutId);
 
-          const loadingSpinner = document.createElement("div");
-          loadingSpinner.setAttribute("class", "removeAppLoadingSpinner");
+            removeButton.innerHTML = "";
 
-          removeButton.appendChild(loadingSpinner);
+            const loadingSpinner = document.createElement("div");
+            loadingSpinner.setAttribute("class", "removeAppLoadingSpinner");
 
-          return window.electronUtils.send("removeApp", app);
+            removeButton.appendChild(loadingSpinner);
+
+            return window.electronUtils.send("removeApp", app);
+          });
+          appInfo.appendChild(removeButton);
+
+          const infoButton = document.createElement("button");
+          infoButton.setAttribute("type", "button");
+          infoButton.innerHTML = "info";
+
+          infoButton.addEventListener("click", () => {
+            return window.electronUtils.send("showAppInfo", appId);
+          });
+
+          appInfo.appendChild(infoButton);
+
+          appList.appendChild(appInfo);
         });
-        appInfo.appendChild(removeButton);
-
-        const infoButton = document.createElement("button");
-        infoButton.setAttribute("type", "button");
-        infoButton.innerHTML = "info";
-
-        infoButton.addEventListener("click", () => {
-          return window.electronUtils.send("showAppInfo", appId);
-        });
-
-        appInfo.appendChild(infoButton);
-
-        appList.appendChild(appInfo);
-      });
     });
 
     document.addEventListener("DOMContentLoaded", () => {
