@@ -37,6 +37,13 @@ function renderRemoveAppsPage(browserWindow, show = false) {
   return removeAppsPage;
 }
 
+const sendAppListToFrontend = () => {
+  if (removeAppsPage) {
+    const flatpakList = runFlatpakList();
+    removeAppsPage.webContents.send("appList", flatpakList);
+  }
+};
+
 function addListeners(removeAppsPage) {
   ipcMain.addListener("refreshAppList", () => {
     const flatpakList = runFlatpakList();
@@ -135,4 +142,5 @@ function runFlatpakList() {
 
 module.exports = {
   renderRemoveAppsPage,
+  sendAppListToFrontend,
 };

@@ -20,3 +20,4 @@ A simple electron app wrapper for Flathub
 # Credits
 
 Flathub icon is from the flathub press kit
+Bootstrap for css + js

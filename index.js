@@ -7,6 +7,8 @@ const { createMenu } = require("./src/menu");
 
 async function createWindow() {
   const win = new BrowserWindow({
+    minWidth: 800,
+    useContentSize: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

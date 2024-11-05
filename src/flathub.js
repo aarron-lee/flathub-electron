@@ -1,5 +1,6 @@
 const { BrowserView, dialog } = require("electron");
 const { exec, spawn } = require("child_process");
+const { sendAppListToFrontend } = require("./removeApps");
 
 const APP_INSTALL_TYPE = {
   Cancel: 0,
@@ -81,6 +82,7 @@ function renderFlathub(browserWindow, show = false) {
         });
         error = true;
 
+        sendAppListToFrontend();
         removeLoadingDialog(flathubView);
       });
 
@@ -94,6 +96,7 @@ function renderFlathub(browserWindow, show = false) {
             message: "Installation complete",
           });
         }
+        sendAppListToFrontend();
         removeLoadingDialog(flathubView);
       });
     }

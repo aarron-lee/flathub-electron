@@ -5,56 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Remove Apps</title>
     <!-- <script type="module" crossorigin src="/assets/index-CFNSYa8S.js"></script> -->
+    <link rel="stylesheet" crossorigin href="./bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" crossorigin href="./reset.css" />
     <style>
       body {
-        font-family: sans-serif;
-        justify-items: center;
+        background-color: white;
+        color: black;
       }
 
-      #appList {
-        display: flex;
-        flex-direction: column;
-      }
-      .removeAppLoadingSpinner {
-        border: 1 solid #f3f3f3; /* Light grey */
-        border-top: 1px solid #3498db; /* Blue */
-        border-radius: 50%;
-        width: 1rem;
-        height: 1rem;
-        animation: spin 2s linear infinite;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #121212;
+          color: white;
         }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
 
-      .app {
-        border-radius: 12px;
-        border: 1px solid black;
-        display: flex;
-        flex-direction: column;
-        min-width: 150px;
-        max-width: 300px;
-        padding: 16px;
-        margin-bottom: 12px;
-      }
-      .app > * {
-        margin-top: 12px;
-      }
-      .app > h3 {
-        text-transform: capitalize;
-        margin-top: 0;
+        .container {
+          background-color: #1e1e1e;
+        }
+
+        .table {
+          color: white;
+        }
+
+        .table thead {
+          background-color: #333;
+        }
+
+        .table tbody tr:nth-child(odd) {
+          background-color: #444;
+        }
+        .table tbody tr:nth-child(even) {
+          background-color: #555;
+        }
       }
     </style>
   </head>
   <body>
-    <div id="appList"></div>
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <table id="appList" class="table-responsive"></table>
+      </div>
+    </div>
   </body>
 
   <script>
@@ -75,6 +66,17 @@
       // clear appList
       appList.replaceChildren();
 
+      appList.innerHTML = `
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">App Id</th>
+          <th scope="col">Type</th>
+          <th scope="col">Flathub</th>
+          <th scope="col">Remove</th>
+        </tr>
+      </thead>`;
+
       data
         .sort((a, b) => {
           const nameA = a.name.toUpperCase();
@@ -91,44 +93,42 @@
         .forEach((app) => {
           const { name, appId, version, branch, installType } = app;
 
-          const appInfo = document.createElement("div");
+          const appInfo = document.createElement("tbody");
 
-          appInfo.innerHTML = `<div id="${appId}" class="app">
-            <h3>${name}</h3>
-            <div>ID: ${appId}</div>
-            <div>Type: ${installType}</div>
-          </div>`;
+          appInfo.innerHTML = `
+          <tr>
+            <th scope="row">${name}</th>
+            <td>${appId}</td>
+            <td>${installType}</td>
+            <td id="info-${appId}"></td>
+            <td id="remove-${appId}"></td>
+          </tr>`;
 
           appList.appendChild(appInfo);
 
-          const removeButton = document.createElement("button");
-
-          removeButton.setAttribute("type", "button");
-          removeButton.innerHTML = "Remove";
+          const removeButton = document.createElement("a");
+          removeButton.innerHTML = "remove";
+          removeButton.setAttribute("class", "link-danger");
 
           removeButton.addEventListener("click", () => {
             clearTimeout(refreshAppListTimeoutId);
 
             removeButton.innerHTML = "";
 
-            const loadingSpinner = document.createElement("div");
-            loadingSpinner.setAttribute("class", "removeAppLoadingSpinner");
-
-            removeButton.appendChild(loadingSpinner);
-
+            removeButton.setAttribute("class", "spinner-border");
             return window.electronUtils.send("removeApp", app);
           });
-          document.getElementById(appId).appendChild(removeButton);
+          document.getElementById(`remove-${appId}`).appendChild(removeButton);
 
-          const infoButton = document.createElement("button");
-          infoButton.setAttribute("type", "button");
-          infoButton.innerHTML = "Flathub";
+          const infoButton = document.createElement("a");
+          infoButton.innerHTML = "info";
+          infoButton.setAttribute("class", "link-info");
 
           infoButton.addEventListener("click", () => {
             return window.electronUtils.send("showAppInfo", appId);
           });
 
-          document.getElementById(appId).appendChild(infoButton);
+          document.getElementById(`info-${appId}`).appendChild(infoButton);
         });
     });
 
@@ -136,4 +136,5 @@
       refreshAppList();
     });
   </script>
+  <script src="./bootstrap/bootstrap.min.js" />
 </html>
