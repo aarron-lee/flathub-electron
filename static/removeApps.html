@@ -7,6 +7,11 @@
     <!-- <script type="module" crossorigin src="/assets/index-CFNSYa8S.js"></script> -->
     <link rel="stylesheet" crossorigin href="./reset.css" />
     <style>
+      body {
+        font-family: sans-serif;
+        justify-items: center;
+      }
+
       #appList {
         display: flex;
         flex-direction: column;
@@ -27,6 +32,24 @@
         100% {
           transform: rotate(360deg);
         }
+      }
+
+      .app {
+        border-radius: 12px;
+        border: 1px solid black;
+        display: flex;
+        flex-direction: column;
+        min-width: 150px;
+        max-width: 300px;
+        padding: 16px;
+        margin-bottom: 12px;
+      }
+      .app > * {
+        margin-top: 12px;
+      }
+      .app > h3 {
+        text-transform: capitalize;
+        margin-top: 0;
       }
     </style>
   </head>
@@ -68,9 +91,15 @@
         .forEach((app) => {
           const { name, appId, version, branch, installType } = app;
 
-          const appInfo = document.createElement("span");
+          const appInfo = document.createElement("div");
 
-          appInfo.innerHTML = `${name} ${appId} ${version} ${branch} ${installType}`;
+          appInfo.innerHTML = `<div id="${appId}" class="app">
+            <h3>${name}</h3>
+            <div>ID: ${appId}</div>
+            <div>Type: ${installType}</div>
+          </div>`;
+
+          appList.appendChild(appInfo);
 
           const removeButton = document.createElement("button");
 
@@ -89,19 +118,17 @@
 
             return window.electronUtils.send("removeApp", app);
           });
-          appInfo.appendChild(removeButton);
+          document.getElementById(appId).appendChild(removeButton);
 
           const infoButton = document.createElement("button");
           infoButton.setAttribute("type", "button");
-          infoButton.innerHTML = "info";
+          infoButton.innerHTML = "Flathub";
 
           infoButton.addEventListener("click", () => {
             return window.electronUtils.send("showAppInfo", appId);
           });
 
-          appInfo.appendChild(infoButton);
-
-          appList.appendChild(appInfo);
+          document.getElementById(appId).appendChild(infoButton);
         });
     });
 
