@@ -1,16 +1,20 @@
-const { BrowserView } = require("electron");
-const path = require("path");
 const { ipcMain } = require("electron");
 
-let TABS;
-
-function saveTabs(tabs) {
-  TABS = tabs;
-}
+const TABS = {
+  CURRENT: "FLATHUB",
+};
 
 ipcMain.on("navButtonClicked", (_, buttonName) => {
   return navigateTo(buttonName);
 });
+
+function getTabs() {
+  return TABS;
+}
+
+function registerTab(tabName, tab) {
+  TABS[tabName] = tab;
+}
 
 function navigateTo(tabName, options = {}) {
   if (tabName === "FLATHUB") {
@@ -66,4 +70,4 @@ function navigateTo(tabName, options = {}) {
   }
 }
 
-module.exports = { saveTabs, navigateTo };
+module.exports = { registerTab, getTabs, navigateTo };

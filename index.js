@@ -5,13 +5,7 @@ const removeApps = require("./src/removeApps");
 const flathub = require("./src/flathub");
 const { createMenu } = require("./src/menu");
 
-const TABS = {
-  CURRENT: "",
-};
-
 async function createWindow() {
-  navigation.saveTabs(TABS);
-
   const win = new BrowserWindow({
     webPreferences: {
       nodeIntegration: false,
@@ -20,11 +14,9 @@ async function createWindow() {
     },
   });
 
-  TABS.ROOT = win;
-  TABS.REMOVE = removeApps.renderRemoveAppsPage(win);
-  TABS.FLATHUB = flathub.renderFlathub(win, true);
-
-  TABS.CURRENT = "FLATHUB";
+  navigation.registerTab("ROOT", win);
+  navigation.registerTab("REMOVE", removeApps.renderRemoveAppsPage(win));
+  navigation.registerTab("FLATHUB", flathub.renderFlathub(win, true));
 }
 
 app.whenReady().then(() => {
