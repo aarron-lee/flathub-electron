@@ -1,6 +1,7 @@
 const { BrowserView, ipcMain, dialog } = require("electron");
 const path = require("path");
 const { spawn, spawnSync } = require("child_process");
+const { navigateTo } = require("./navigation");
 
 let removeAppsPage;
 
@@ -40,6 +41,13 @@ function addListeners(removeAppsPage) {
   ipcMain.addListener("refreshAppList", () => {
     const flatpakList = runFlatpakList();
     removeAppsPage.webContents.send("appList", flatpakList);
+  });
+
+  ipcMain.addListener("showAppInfo", (_, appId) => {
+    console.log(appId);
+    return navigateTo("FLATHUB", {
+      targetUrl: `https://flathub.org/apps/${appId}`,
+    });
   });
 
   ipcMain.addListener("removeApp", (_, app) => {

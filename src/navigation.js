@@ -9,11 +9,17 @@ function saveTabs(tabs) {
 }
 
 ipcMain.on("navButtonClicked", (_, buttonName) => {
-  if (buttonName === "FLATHUB") {
+  return navigateTo(buttonName);
+});
+
+function navigateTo(tabName, options = {}) {
+  if (tabName === "FLATHUB") {
     if (TABS.CURRENT === "FLATHUB") {
       // already on flathub page, navigate to flathub.org home
       TABS.FLATHUB.webContents.loadURL("https://flathub.org");
     } else if (TABS.CURRENT === "REMOVE") {
+      const { targetUrl } = options;
+
       TABS.ROOT?.removeBrowserView(TABS.REMOVE);
 
       TABS.FLATHUB?.setBounds({
@@ -29,11 +35,15 @@ ipcMain.on("navButtonClicked", (_, buttonName) => {
         vertical: false,
       });
 
+      if (targetUrl) {
+        TABS.FLATHUB.webContents.loadURL(targetUrl);
+      }
+
       TABS.ROOT?.addBrowserView(TABS.FLATHUB);
       TABS.CURRENT = "FLATHUB";
     }
   }
-  if (buttonName === "REMOVE") {
+  if (tabName === "REMOVE") {
     if (TABS.CURRENT === "FLATHUB") {
       TABS.ROOT?.removeBrowserView(TABS.FLATHUB);
 
@@ -54,8 +64,7 @@ ipcMain.on("navButtonClicked", (_, buttonName) => {
       TABS.CURRENT = "REMOVE";
     }
   }
-});
-
+}
 function renderNavigation(browserWindow, show = false) {
   const navigation = new BrowserView({
     webPreferences: {
@@ -87,4 +96,4 @@ function renderNavigation(browserWindow, show = false) {
   return navigation;
 }
 
-module.exports = { renderNavigation, saveTabs };
+module.exports = { renderNavigation, saveTabs, navigateTo };

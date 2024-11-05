@@ -40,12 +40,15 @@
         });
         appInfo.appendChild(removeButton);
 
-        const infoLink = document.createElement("a");
-        infoLink.href = `https://flathub.org/apps/${appId}`;
-        infoLink.target = "_blank";
-        infoLink.innerHTML = "info";
+        const infoButton = document.createElement("button");
+        infoButton.setAttribute("type", "button");
+        infoButton.innerHTML = "info";
 
-        appInfo.appendChild(infoLink);
+        infoButton.addEventListener("click", () => {
+          return window.electronUtils.send("showAppInfo", appId);
+        });
+
+        appInfo.appendChild(infoButton);
 
         appList.appendChild(appInfo);
       });
