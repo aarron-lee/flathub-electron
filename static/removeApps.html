@@ -30,6 +30,23 @@
 
         appInfo.innerHTML = `${name} ${appId} ${version} ${branch} ${installType}`;
 
+        const removeButton = document.createElement("button");
+
+        removeButton.setAttribute("type", "button");
+        removeButton.innerHTML = "Remove";
+
+        removeButton.addEventListener("click", () => {
+          return window.electronUtils.send("removeApp", app);
+        });
+        appInfo.appendChild(removeButton);
+
+        const infoLink = document.createElement("a");
+        infoLink.href = `https://flathub.org/apps/${appId}`;
+        infoLink.target = "_blank";
+        infoLink.innerHTML = "info";
+
+        appInfo.appendChild(infoLink);
+
         appList.appendChild(appInfo);
       });
     });

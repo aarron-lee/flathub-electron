@@ -1,6 +1,6 @@
-const { BrowserView, ipcMain } = require("electron");
+const { BrowserView, ipcMain, dialog } = require("electron");
 const path = require("path");
-const { spawnSync } = require("child_process");
+const { spawn, spawnSync } = require("child_process");
 
 let removeAppsPage;
 
@@ -31,12 +31,66 @@ function renderRemoveAppsPage(browserWindow, show = false) {
 
   if (show) browserWindow.addBrowserView(removeAppsPage);
 
+  addListeners(removeAppsPage);
+
+  return removeAppsPage;
+}
+
+function addListeners(removeAppsPage) {
   ipcMain.addListener("refreshAppList", () => {
     const flatpakList = runFlatpakList();
     removeAppsPage.webContents.send("appList", flatpakList);
   });
 
-  return removeAppsPage;
+  ipcMain.addListener("removeApp", (_, app) => {
+    console.log("removeApp", app);
+    const { name, appId, installType } = app;
+
+    const terminal = spawn(
+      "flatpak",
+      [
+        "remove",
+        installType === "user" ? "--user" : "--system",
+        "--noninteractive",
+        "-y",
+        appId,
+      ],
+      {
+        shell: true,
+      }
+    );
+
+    let error = false;
+
+    terminal.stderr.on("data", (data) => {
+      console.error(`stderr: ${data}`);
+
+      dialog.showMessageBox({
+        title: "Error",
+        type: "error",
+        message: `Installation failed with error:\n ${data}`,
+      });
+      error = true;
+
+      const flatpakList = runFlatpakList();
+      removeAppsPage.webContents.send("appList", flatpakList);
+    });
+
+    terminal.on("close", (code) => {
+      console.log(`child process exited with code ${code}`);
+
+      if (code === 0 && !error) {
+        dialog.showMessageBox({
+          title: "Removal Complete",
+          type: "info",
+          message: `${name} remove complete`,
+        });
+
+        const flatpakList = runFlatpakList();
+        removeAppsPage.webContents.send("appList", flatpakList);
+      }
+    });
+  });
 }
 
 function parseFlatpakList(output) {
