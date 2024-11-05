@@ -15,6 +15,20 @@ ipcMain.on("navButtonClicked", (_, buttonName) => {
       TABS.FLATHUB.webContents.loadURL("https://flathub.org");
     } else if (TABS.CURRENT === "REMOVE") {
       TABS.ROOT?.removeBrowserView(TABS.REMOVE);
+
+      TABS.FLATHUB?.setBounds({
+        x: 0,
+        y: 36,
+        width: TABS.ROOT.getBounds().width,
+        height: TABS.ROOT.getBounds().height - 36,
+      });
+      TABS.FLATHUB?.setAutoResize({
+        width: true,
+        height: true,
+        horizontal: false,
+        vertical: false,
+      });
+
       TABS.ROOT?.addBrowserView(TABS.FLATHUB);
       TABS.CURRENT = "FLATHUB";
     }
@@ -22,6 +36,20 @@ ipcMain.on("navButtonClicked", (_, buttonName) => {
   if (buttonName === "REMOVE") {
     if (TABS.CURRENT === "FLATHUB") {
       TABS.ROOT?.removeBrowserView(TABS.FLATHUB);
+
+      TABS.REMOVE?.setBounds({
+        x: 0,
+        y: 36,
+        width: TABS.ROOT.getBounds().width,
+        height: TABS.ROOT.getBounds().height - 36,
+      });
+      TABS.REMOVE?.setAutoResize({
+        width: true,
+        height: true,
+        horizontal: false,
+        vertical: false,
+      });
+
       TABS.ROOT?.addBrowserView(TABS.REMOVE);
       TABS.CURRENT = "REMOVE";
     }
