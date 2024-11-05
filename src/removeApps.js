@@ -2,8 +2,10 @@ const { BrowserView, ipcMain } = require("electron");
 const path = require("path");
 const { spawnSync } = require("child_process");
 
+let removeAppsPage;
+
 function renderRemoveAppsPage(browserWindow, show = false) {
-  const removeAppsPage = new BrowserView({
+  removeAppsPage = new BrowserView({
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,

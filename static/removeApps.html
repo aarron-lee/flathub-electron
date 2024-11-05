@@ -35,9 +35,15 @@
     });
 
     document.addEventListener("DOMContentLoaded", () => {
-      if (window.electronUtils) {
-        window.electronUtils.send("refreshAppList");
-      }
+      const refreshAppList = () => {
+        if (window.electronUtils) {
+          window.electronUtils.send("refreshAppList");
+        }
+
+        setTimeout(refreshAppList, 10000);
+      };
+
+      refreshAppList();
     });
   </script>
 </html>
