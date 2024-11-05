@@ -1,14 +1,22 @@
 const { BrowserView } = require("electron");
 const path = require("path");
+const { ipcMain } = require("electron");
 
-function renderNavigation(browserWindow) {
+ipcMain.on("navButtonClicked", (_, buttonName) => {
+  console.log(buttonName);
+  //   handleGamepadButtonPress(mainWindow, buttonName);
+});
+
+// tabs.NAVIGATION;
+// tabs.FLATHUB;
+// tabs.REMOVE;
+
+function renderNavigation(browserWindow, tabs) {
   const navigation = new BrowserView({
     webPreferences: {
-      // devTools: isDev,
-      // enableRemoteModule: false,
       contextIsolation: true,
       nodeIntegration: false,
-      // preload: __dirname + "/client-preload.js",
+      preload: path.join(__dirname, "./preload.js"),
     },
   });
 

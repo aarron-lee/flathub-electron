@@ -7,8 +7,42 @@
     <title>Navigation</title>
     <!-- <script type="module" crossorigin src="/assets/index-CFNSYa8S.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-oot1RXt_.css" /> -->
+    <style>
+      .navButtons {
+        display: flex;
+        flex-direction: row;
+      }
+      .navButtons > button {
+        margin: 0 0.5rem;
+        display: block;
+      }
+    </style>
   </head>
   <body>
-    <div id="root">testing 1234</div>
+    <div class="navButtons">
+      <button id="flathubButton" type="button">Flathub</button>
+      <button id="removeAppsButton" type="button">Remove Apps</button>
+    </div>
   </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const flathubButton = document.getElementById("flathubButton");
+      const removeAppsButton = document.getElementById("removeAppsButton");
+
+      flathubButton.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        if (window.electronUtils) {
+          window.electronUtils.navButtonClicked("FLATHUB");
+        }
+      });
+      removeAppsButton.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        if (window.electronUtils) {
+          window.electronUtils.navButtonClicked("REMOVE");
+        }
+      });
+    });
+  </script>
 </html>

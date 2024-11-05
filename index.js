@@ -1,6 +1,6 @@
 const { app, BrowserWindow, BrowserView, dialog } = require("electron");
 const { exec, spawn } = require("child_process");
-
+const path = require("path");
 const navigation = require("./src/navigation");
 
 const APP_INSTALL_TYPE = {
@@ -16,12 +16,13 @@ async function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      preload: path.join(__dirname, "./src/preload.js"),
     },
   });
 
   win.setMenuBarVisibility(false);
 
-  const navigationTab = navigation.renderNavigation(win);
+  const navigationTab = navigation.renderNavigation(win, TABS);
   TABS.NAVIGATION = navigationTab;
 
   renderFlathub(win);
@@ -169,10 +170,6 @@ async function getAppInstallType() {
 }
 
 function renderFlathub(win) {
-  if (TABS.FLATHUB) {
-    return TABS.FLATHUB;
-  }
-
   const flathubView = new BrowserView({
     webPreferences: {
       // devTools: isDev,
