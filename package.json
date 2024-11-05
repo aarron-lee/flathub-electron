@@ -13,7 +13,9 @@
     "productName": "Flathub",
     "files": [
       "index.js",
-      "package.json"
+      "package.json",
+      "src",
+      "static"
     ],
     "linux": {
       "target": [
