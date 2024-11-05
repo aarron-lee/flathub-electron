@@ -38,12 +38,6 @@ function renderFlathub(browserWindow, show = false) {
   flathubView.webContents.on("will-navigate", async (event) => {
     const url = new URL(event.url);
 
-    const validOrigins = ["https://dl.flathub.org", "https://flathub.org"];
-
-    if (!validOrigins.includes(url.origin)) {
-      event.preventDefault();
-    }
-
     if (url.host == "dl.flathub.org" && url.pathname.includes(".flatpakref")) {
       event.preventDefault();
 
