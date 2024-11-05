@@ -80,8 +80,7 @@ function addListeners(removeAppsPage) {
       });
       error = true;
 
-      const flatpakList = runFlatpakList();
-      removeAppsPage.webContents.send("appList", flatpakList);
+      removeAppsPage.webContents.send("resumeRefreshAppList");
     });
 
     terminal.on("close", (code) => {
@@ -94,8 +93,7 @@ function addListeners(removeAppsPage) {
           message: `${name} remove complete`,
         });
 
-        const flatpakList = runFlatpakList();
-        removeAppsPage.webContents.send("appList", flatpakList);
+        removeAppsPage.webContents.send("resumeRefreshAppList");
       }
     });
   });
