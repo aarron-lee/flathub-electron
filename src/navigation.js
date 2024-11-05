@@ -16,12 +16,18 @@ function registerTab(tabName, tab) {
   TABS[tabName] = tab;
 }
 
+const TAB_NAMES = {
+  ROOT: "ROOT",
+  REMOVE: "REMOVE",
+  FLATHUB: "FLATHUB",
+};
+
 function navigateTo(tabName, options = {}) {
-  if (tabName === "FLATHUB") {
-    if (TABS.CURRENT === "FLATHUB") {
+  if (tabName === TAB_NAMES.FLATHUB) {
+    if (TABS.CURRENT === TAB_NAMES.FLATHUB) {
       // already on flathub tab, Go Back instead
       TABS.FLATHUB.webContents.goBack();
-    } else if (TABS.CURRENT === "REMOVE") {
+    } else if (TABS.CURRENT === TAB_NAMES.REMOVE) {
       const { targetUrl } = options;
 
       TABS.ROOT?.removeBrowserView(TABS.REMOVE);
@@ -44,11 +50,11 @@ function navigateTo(tabName, options = {}) {
       }
 
       TABS.ROOT?.addBrowserView(TABS.FLATHUB);
-      TABS.CURRENT = "FLATHUB";
+      TABS.CURRENT = TAB_NAMES.FLATHUB;
     }
   }
-  if (tabName === "REMOVE") {
-    if (TABS.CURRENT === "FLATHUB") {
+  if (tabName === TAB_NAMES.REMOVE) {
+    if (TABS.CURRENT === TAB_NAMES.FLATHUB) {
       TABS.ROOT?.removeBrowserView(TABS.FLATHUB);
 
       TABS.REMOVE?.setBounds({
@@ -65,9 +71,9 @@ function navigateTo(tabName, options = {}) {
       });
 
       TABS.ROOT?.addBrowserView(TABS.REMOVE);
-      TABS.CURRENT = "REMOVE";
+      TABS.CURRENT = TAB_NAMES.REMOVE;
     }
   }
 }
 
-module.exports = { registerTab, getTabs, navigateTo };
+module.exports = { TAB_NAMES, registerTab, getTabs, navigateTo };

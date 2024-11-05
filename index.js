@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
-const navigation = require("./src/navigation");
+const { registerTab, TAB_NAMES } = require("./src/navigation");
 const removeApps = require("./src/removeApps");
 const flathub = require("./src/flathub");
 const { createMenu } = require("./src/menu");
@@ -14,9 +14,9 @@ async function createWindow() {
     },
   });
 
-  navigation.registerTab("ROOT", win);
-  navigation.registerTab("REMOVE", removeApps.renderRemoveAppsPage(win));
-  navigation.registerTab("FLATHUB", flathub.renderFlathub(win, true));
+  registerTab(TAB_NAMES.ROOT, win);
+  registerTab(TAB_NAMES.REMOVE, removeApps.renderRemoveAppsPage(win));
+  registerTab(TAB_NAMES.FLATHUB, flathub.renderFlathub(win, true));
 }
 
 app.whenReady().then(() => {
