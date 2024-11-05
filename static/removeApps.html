@@ -7,8 +7,37 @@
     <title>Remove Apps</title>
     <!-- <script type="module" crossorigin src="/assets/index-CFNSYa8S.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-oot1RXt_.css" /> -->
+    <style>
+      #appList {
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
   </head>
   <body>
-    Remove Apps Page
+    <div id="appList"></div>
   </body>
+
+  <script>
+    window.electronUtils.receive("appList", (data) => {
+      const appList = document.getElementById("appList");
+      appList.innerHTML = "";
+
+      data?.forEach((app) => {
+        const { name, appId, version, branch, installType } = app;
+
+        const appInfo = document.createElement("span");
+
+        appInfo.innerHTML = `${name} ${appId} ${version} ${branch} ${installType}`;
+
+        appList.appendChild(appInfo);
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.electronUtils) {
+        window.electronUtils.send("refreshAppList");
+      }
+    });
+  </script>
 </html>
