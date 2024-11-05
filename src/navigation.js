@@ -2,16 +2,33 @@ const { BrowserView } = require("electron");
 const path = require("path");
 const { ipcMain } = require("electron");
 
+let TABS;
+
+function saveTabs(tabs) {
+  TABS = tabs;
+}
+
 ipcMain.on("navButtonClicked", (_, buttonName) => {
-  console.log(buttonName);
-  //   handleGamepadButtonPress(mainWindow, buttonName);
+  if (buttonName === "FLATHUB") {
+    if (TABS.CURRENT === "FLATHUB") {
+      // already on flathub page, navigate to flathub.org home
+      TABS.FLATHUB.webContents.loadURL("https://flathub.org");
+    } else if (TABS.CURRENT === "REMOVE") {
+      TABS.ROOT?.removeBrowserView(TABS.REMOVE);
+      TABS.ROOT?.addBrowserView(TABS.FLATHUB);
+      TABS.CURRENT = "FLATHUB";
+    }
+  }
+  if (buttonName === "REMOVE") {
+    if (TABS.CURRENT === "FLATHUB") {
+      TABS.ROOT?.removeBrowserView(TABS.FLATHUB);
+      TABS.ROOT?.addBrowserView(TABS.REMOVE);
+      TABS.CURRENT = "REMOVE";
+    }
+  }
 });
 
-// tabs.NAVIGATION;
-// tabs.FLATHUB;
-// tabs.REMOVE;
-
-function renderNavigation(browserWindow, tabs) {
+function renderNavigation(browserWindow, show = false) {
   const navigation = new BrowserView({
     webPreferences: {
       contextIsolation: true,
@@ -37,9 +54,9 @@ function renderNavigation(browserWindow, tabs) {
     vertical: false,
   });
 
-  browserWindow.addBrowserView(navigation);
+  if (show) browserWindow.addBrowserView(navigation);
 
   return navigation;
 }
 
-module.exports = { renderNavigation };
+module.exports = { renderNavigation, saveTabs };

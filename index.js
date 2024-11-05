@@ -2,6 +2,7 @@ const { app, BrowserWindow, BrowserView, dialog } = require("electron");
 const { exec, spawn } = require("child_process");
 const path = require("path");
 const navigation = require("./src/navigation");
+const removeApps = require("./src/removeApps");
 
 const APP_INSTALL_TYPE = {
   Cancel: 0,
@@ -9,9 +10,13 @@ const APP_INSTALL_TYPE = {
   System: 2,
 };
 
-const TABS = {};
+const TABS = {
+  CURRENT: "",
+};
 
 async function createWindow() {
+  navigation.saveTabs(TABS);
+
   const win = new BrowserWindow({
     webPreferences: {
       nodeIntegration: false,
@@ -20,12 +25,17 @@ async function createWindow() {
     },
   });
 
+  TABS.ROOT = win;
+
   win.setMenuBarVisibility(false);
 
-  const navigationTab = navigation.renderNavigation(win, TABS);
-  TABS.NAVIGATION = navigationTab;
+  TABS.NAVIGATION = navigation.renderNavigation(win, true);
+
+  TABS.REMOVE = removeApps.renderRemoveAppsPage(win);
 
   renderFlathub(win);
+
+  TABS.CURRENT = "FLATHUB";
 }
 
 app.whenReady().then(createWindow);
