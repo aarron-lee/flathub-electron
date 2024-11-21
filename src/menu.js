@@ -10,13 +10,26 @@ function createMenu() {
         navigation.navigateTo("FLATHUB");
       },
     },
-
     {
       label: "Manage Apps",
       click() {
         navigation.navigateTo("REMOVE");
       },
     },
+    // {
+    //   label: "View",
+    //   submenu: [
+    //     { role: "reload" },
+    //     { role: "forceReload" },
+    //     { role: "toggleDevTools" },
+    //     { type: "separator" },
+    //     { role: "resetZoom" },
+    //     { role: "zoomIn" },
+    //     { role: "zoomOut" },
+    //     { type: "separator" },
+    //     { role: "togglefullscreen" },
+    //   ],
+    // },
   ];
 
   const menu = Menu.buildFromTemplate(template);

@@ -23,6 +23,8 @@ async function createWindow() {
     },
   });
 
+  win.webContents.openDevTools();
+
   createTray();
 
   tray.on("click", () => {

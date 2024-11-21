@@ -7,43 +7,14 @@
     <!-- <script type="module" crossorigin src="/assets/index-CFNSYa8S.js"></script> -->
     <link rel="stylesheet" crossorigin href="./bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" crossorigin href="./reset.css" />
-    <style>
-      body {
-        background-color: #fafafa;
-        color: black;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        body {
-          background-color: #251f32;
-          color: white;
-        }
-
-        .container {
-          background-color: #1e1e1e;
-        }
-
-        .table {
-          color: white;
-        }
-
-        .table thead {
-          background-color: #333;
-        }
-
-        .table tbody tr:nth-child(odd) {
-          background-color: #444;
-        }
-        .table tbody tr:nth-child(even) {
-          background-color: #555;
-        }
-      }
-    </style>
   </head>
   <body>
     <div class="container-fluid">
       <div class="row justify-content-center">
-        <table id="appList" class="table-responsive"></table>
+        <table
+          id="appList"
+          class="table table-lg table-responsive table-striped table-dark table-bordered table-hover"
+        ></table>
       </div>
     </div>
   </body>
@@ -77,6 +48,10 @@
         </tr>
       </thead>`;
 
+      const tableBody = document.createElement("tbody");
+
+      appList.appendChild(tableBody);
+
       data
         .sort((a, b) => {
           const nameA = a.name.toUpperCase();
@@ -93,18 +68,17 @@
         .forEach((app) => {
           const { name, appId, version, branch, installType } = app;
 
-          const appInfo = document.createElement("tbody");
+          const appInfo = document.createElement("tr");
 
           appInfo.innerHTML = `
-          <tr>
             <th scope="row">${name}</th>
             <td>${appId}</td>
             <td>${installType}</td>
             <td id="info-${appId}"></td>
             <td id="remove-${appId}"></td>
-          </tr>`;
+          `;
 
-          appList.appendChild(appInfo);
+          tableBody.appendChild(appInfo);
 
           const removeButton = document.createElement("a");
           removeButton.innerHTML = "remove";
