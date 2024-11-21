@@ -21,7 +21,7 @@
       "target": [
         "AppImage"
       ],
-      "icon": "img/icon.svg",
+      "icon": "img/icon-white.svg",
       "artifactName": "${productName}_v${version}_linux.${ext}",
       "category": "Utility"
     }
