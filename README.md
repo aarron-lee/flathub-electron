@@ -3,7 +3,7 @@
 A simple electron app wrapper for Flathub
 
 ![flathub](./screenshots/flathub.png)
-![manage apps](./screenshots/manage_apps.png)
+![manage apps](./screenshots/manage_apps_1.png)
 
 # Features
 
