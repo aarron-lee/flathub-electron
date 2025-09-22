@@ -39,13 +39,14 @@ function renderFlathub(browserWindow, show = false) {
   flathubView.webContents.on("will-navigate", async (event) => {
     const url = new URL(event.url);
 
-    if (url.host == "dl.flathub.org" && url.pathname.includes(".flatpakref")) {
+    const pattern = /\/.*\/apps\/.*\/install/;
+
+    if (url.host == "flathub.org" && pattern.test(url.pathname)) {
       event.preventDefault();
 
-      const flatpakRef = url.pathname
-        .split("/")
-        .pop()
-        .replace(".flatpakref", "");
+      const urlParts = url.pathname.split("/");
+
+      const flatpakRef = urlParts[urlParts.length - 2];
 
       const installType = await getAppInstallType();
 
@@ -65,7 +66,7 @@ function renderFlathub(browserWindow, show = false) {
         ],
         {
           shell: true,
-        }
+        },
       );
 
       createLoadingDialog(flathubView);
@@ -121,7 +122,7 @@ function createLoadingDialog(win) {
           border-radius: 50%;
         \`
         );
-  
+
         dialog.innerHTML = \`<style>
         #electronLoadingSpinner {
           border: 16px solid #f3f3f3; /* Light grey */
@@ -131,18 +132,18 @@ function createLoadingDialog(win) {
           height: 120px;
           animation: spin 2s linear infinite;
         }
-  
+
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
       </style>
       <div id="electronLoadingSpinner"></div>\`;
-  
+
         document.body.appendChild(dialog);
-  
+
         dialog.show();
-  
+
       };
       createDialog();
     `;
@@ -197,7 +198,11 @@ async function getAppInstallType() {
     return APP_INSTALL_TYPE.Cancel;
   }
 
-  if (!remotes.includes("system") && !remotes.includes("user")) {
+  if (
+    !remotes.includes("system") &&
+    !remotes.includes("user") &&
+    !remotes.includes("system,filtered")
+  ) {
     // no available remotes for flathub, prompt error
     dialog.showMessageBox({
       title: "Error",
@@ -214,11 +219,13 @@ async function getAppInstallType() {
         return APP_INSTALL_TYPE.User;
       case "system":
         return APP_INSTALL_TYPE.System;
+      case "system,filtered":
+        return APP_INSTALL_TYPE.System;
     }
   }
   if (
     remotes.length == 2 &&
-    remotes.includes("system") &&
+    (remotes.includes("system") || remotes.includes("system,filtered")) &&
     remotes.includes("user")
   ) {
     let idx = dialog.showMessageBoxSync({
