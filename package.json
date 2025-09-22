@@ -1,6 +1,6 @@
 {
   "name": "flathub",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Electron wrapper for flathub",
   "main": "index.js",
   "scripts": {
