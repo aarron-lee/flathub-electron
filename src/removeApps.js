@@ -14,7 +14,7 @@ function renderRemoveAppsPage(browserWindow, show = false) {
     },
   });
   removeAppsPage.webContents.loadFile(
-    path.join(__dirname, "../static/removeApps.html")
+    path.join(__dirname, "../static/removeApps.html"),
   );
 
   removeAppsPage.setBounds({
@@ -65,14 +65,14 @@ function addListeners(removeAppsPage) {
       "flatpak",
       [
         "remove",
-        installType === "user" ? "--user" : "--system",
+        installType.indexOf("system") >= 0 ? "--system" : "--user",
         "--noninteractive",
         "-y",
         appId,
       ],
       {
         shell: true,
-      }
+      },
     );
 
     let error = false;
