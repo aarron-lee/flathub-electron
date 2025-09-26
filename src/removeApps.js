@@ -83,7 +83,7 @@ function addListeners(removeAppsPage) {
       dialog.showMessageBox({
         title: "Error",
         type: "error",
-        message: `Installation failed with error:\n ${data}`,
+        message: `Uninstall failed with error:\n ${data}`,
       });
       error = true;
 
@@ -112,7 +112,7 @@ function parseFlatpakList(output) {
   const dataLines = lines.filter((line) => line?.trim() !== "");
 
   return dataLines.map((line) => {
-    const [name, appId, version, branch, installType] = line
+    const [name, appId, version, branch, origin, installType] = line
       .split("\t")
       .map((p) => p?.trim());
 
@@ -121,6 +121,7 @@ function parseFlatpakList(output) {
       appId,
       version,
       branch,
+      origin,
       installType,
     };
   });
