@@ -224,7 +224,7 @@ async function getAppInstallType() {
     }
   }
   if (
-    remotes.length == 2 &&
+    remotes.length >= 2 &&
     (remotes.includes("system") || remotes.includes("system,filtered")) &&
     remotes.includes("user")
   ) {

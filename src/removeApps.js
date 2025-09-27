@@ -116,7 +116,7 @@ function parseFlatpakList(output) {
       .split("\t")
       .map((p) => p?.trim());
 
-    return {
+    const result = {
       name,
       appId,
       version,
@@ -124,6 +124,8 @@ function parseFlatpakList(output) {
       origin,
       installType,
     };
+
+    return result;
   });
 }
 
@@ -131,7 +133,11 @@ function runFlatpakList() {
   let apps = [];
 
   try {
-    const result = spawnSync("flatpak", ["list", "--app"]);
+    const result = spawnSync("flatpak", [
+      "list",
+      "--app",
+      "--columns=name,application,version,branch,origin,installation",
+    ]);
 
     apps = parseFlatpakList(result.stdout.toString());
   } catch (e) {
